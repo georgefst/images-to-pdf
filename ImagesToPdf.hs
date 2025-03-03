@@ -62,9 +62,12 @@ main = do
                         (throwError "metadata error")
                         pure
                         ( (,)
-                            <$> ( (,)
-                                    <$> (Map.lookup exifImageWidth exif >>= \case ExifNumber n -> Just n; _ -> Nothing)
-                                    <*> (Map.lookup exifImageHeight exif >>= \case ExifNumber n -> Just n; _ -> Nothing)
+                            <$> ( let toNumber = \case
+                                        ExifNumber n -> Just n
+                                        _ -> Nothing
+                                   in (,)
+                                        <$> (Map.lookup exifImageWidth exif >>= toNumber)
+                                        <*> (Map.lookup exifImageHeight exif >>= toNumber)
                                 )
                             <*> ( getOrientation exif <&> \case
                                     Normal -> (Nothing, False)
