@@ -61,19 +61,19 @@ main = do
                     <*> maybe
                         (throwError "metadata error")
                         pure
-                        ( (,)
-                            <$> ( let toNumber = \case
+                        ( flip (,)
+                            <$> ( getOrientation exif <&> \case
+                                    Normal -> (Nothing, False)
+                                    Mirror -> (Nothing, True)
+                                    Rotation a -> (Just a, False)
+                                    MirrorRotation a -> (Just a, True)
+                                )
+                            <*> ( let toNumber = \case
                                         ExifNumber n -> Just n
                                         _ -> Nothing
                                    in (,)
                                         <$> (toNumber =<< Map.lookup exifImageWidth exif)
                                         <*> (toNumber =<< Map.lookup exifImageHeight exif)
-                                )
-                            <*> ( getOrientation exif <&> \case
-                                    Normal -> (Nothing, False)
-                                    Mirror -> (Nothing, True)
-                                    Rotation a -> (Just a, False)
-                                    MirrorRotation a -> (Just a, True)
                                 )
                         )
     let allDimensions =
