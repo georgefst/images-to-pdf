@@ -26,7 +26,8 @@ if os(windows)
 import Control.Monad
 import Control.Monad.Except
 import Control.Monad.IO.Class
-import Data.Foldable hiding (maximumBy)
+import Data.Bifunctor
+import Data.Foldable hiding (maximum)
 import Data.Foldable1
 import Data.Function
 import Data.Functor
@@ -40,6 +41,7 @@ import System.Directory
 import System.Environment
 import System.Exit
 import System.FilePath
+import Prelude hiding (maximum, unzip)
 
 main :: IO ()
 main = do
@@ -73,7 +75,7 @@ main = do
                         )
     let allDimensions =
             imgs <&> \(_, (size, (r, _))) -> applyWhen (not $ r == Nothing || r == Just HundredAndEighty) swap size
-        pageSize = both fromIntegral $ maximumBy (compare `on` uncurry (*)) allDimensions
+        pageSize = both fromIntegral . bimap maximum maximum $ unzip allDimensions
         rect = uncurry (PDFRect 0 0) pageSize
         docInfo = standardDocInfo{compressed = False}
     runPdf outPath docInfo rect $ for_ imgs \(imageFile, (_, (rotation, mirror))) -> do
