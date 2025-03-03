@@ -15,7 +15,6 @@ build-depends:
     HPDF,
     hsexif,
     mtl,
-    nonempty-containers,
     pretty-simple,
     transformers,
 -}
@@ -27,13 +26,12 @@ if os(windows)
 import Control.Monad
 import Control.Monad.Except
 import Control.Monad.IO.Class
-import Data.Foldable
+import Data.Foldable hiding (maximumBy)
+import Data.Foldable1
 import Data.Function
 import Data.Functor
-import Data.List.NonEmpty (NonEmpty ((:|)))
 import Data.List.NonEmpty qualified as NE
 import Data.Map qualified as Map
-import Data.Set.NonEmpty qualified as NESet
 import Data.Traversable
 import Data.Tuple.Extra
 import Graphics.HsExif
@@ -73,12 +71,11 @@ main = do
                                     MirrorRotation a -> (Just a, True)
                                 )
                         )
-    let (both fromIntegral -> pageSize) :| otherDimensions =
-            NESet.toList . NESet.fromList $
-                imgs <&> \(_, (size, (r, _))) -> applyWhen (not $ r == Nothing || r == Just HundredAndEighty) swap size
+    let allDimensions =
+            imgs <&> \(_, (size, (r, _))) -> applyWhen (not $ r == Nothing || r == Just HundredAndEighty) swap size
+        pageSize = both fromIntegral $ maximumBy (compare `on` uncurry (*)) allDimensions
         rect = uncurry (PDFRect 0 0) pageSize
         docInfo = standardDocInfo{compressed = False}
-    when (not $ null otherDimensions) $ putStrLn "warning: not all image dimensions match"
     runPdf outPath docInfo rect $ for_ imgs \(imageFile, (_, (rotation, mirror))) -> do
         pageRef <- addPage Nothing
         jpgRef <- createPDFJpeg imageFile
