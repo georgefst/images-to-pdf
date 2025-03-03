@@ -74,7 +74,7 @@ main = do
                                 )
                         )
     let allDimensions =
-            imgs <&> \(_, (size, (r, _))) -> applyWhen (not $ r == Nothing || r == Just HundredAndEighty) swap size
+            imgs <&> \(_, (size, (r, _))) -> applyWhen (r `notElem` [Nothing, Just HundredAndEighty]) swap size
         pageSize = both fromIntegral . bimap maximum maximum $ unzip allDimensions
         rect = uncurry (PDFRect 0 0) pageSize
         docInfo = standardDocInfo{compressed = False}
