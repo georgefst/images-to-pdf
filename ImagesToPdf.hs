@@ -61,24 +61,24 @@ main = do
                     <*> maybe
                         (throwError "metadata error")
                         pure
-                        ( flip (,)
-                            <$> ( getOrientation exif <&> \case
+                        do
+                            transforms <-
+                                getOrientation exif <&> \case
                                     Normal -> (Nothing, False)
                                     Mirror -> (Nothing, True)
                                     Rotation a -> (Just a, False)
                                     MirrorRotation a -> (Just a, True)
-                                )
-                            <*> ( let toNumber = \case
-                                        ExifNumber n -> Just n
-                                        _ -> Nothing
-                                   in (,)
-                                        <$> (toNumber =<< Map.lookup exifImageWidth exif)
-                                        <*> (toNumber =<< Map.lookup exifImageHeight exif)
-                                )
-                        )
-    let allDimensions =
-            imgs <&> \(_, (size, (r, _))) -> applyWhen (r `notElem` [Nothing, Just HundredAndEighty]) swap size
-        pageSize = both fromIntegral . bimap maximum maximum $ unzip allDimensions
+                            size <-
+                                applyWhen (fst transforms `notElem` [Nothing, Just HundredAndEighty]) swap
+                                    <$> let toNumber = \case
+                                                ExifNumber n -> Just n
+                                                _ -> Nothing
+                                         in (,)
+                                                <$> (toNumber =<< Map.lookup exifImageWidth exif)
+                                                <*> (toNumber =<< Map.lookup exifImageHeight exif)
+
+                            pure (size, transforms)
+    let pageSize = both fromIntegral . bimap maximum maximum $ unzip $ fst . snd <$> imgs
         rect = uncurry (PDFRect 0 0) pageSize
         docInfo = standardDocInfo{compressed = False}
     runPdf outPath docInfo rect $ for_ imgs \(imageFile, (_, (rotation, mirror))) -> do
