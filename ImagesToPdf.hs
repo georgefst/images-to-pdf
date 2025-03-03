@@ -66,8 +66,8 @@ main = do
                                         ExifNumber n -> Just n
                                         _ -> Nothing
                                    in (,)
-                                        <$> (Map.lookup exifImageWidth exif >>= toNumber)
-                                        <*> (Map.lookup exifImageHeight exif >>= toNumber)
+                                        <$> (toNumber =<< Map.lookup exifImageWidth exif)
+                                        <*> (toNumber =<< Map.lookup exifImageHeight exif)
                                 )
                             <*> ( getOrientation exif <&> \case
                                     Normal -> (Nothing, False)
