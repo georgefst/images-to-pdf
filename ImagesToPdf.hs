@@ -26,7 +26,7 @@ if os(windows)
 import Control.Monad
 import Control.Monad.Except
 import Control.Monad.IO.Class
-import Data.Bifunctor
+import Data.Biapplicative
 import Data.Foldable hiding (maximum)
 import Data.Foldable1
 import Data.Function
@@ -81,7 +81,7 @@ main = do
     let pageSize = both fromIntegral . bimap maximum maximum $ unzip $ fst . snd <$> imgs
         rect = uncurry (PDFRect 0 0) pageSize
         docInfo = standardDocInfo{compressed = False}
-    runPdf outPath docInfo rect $ for_ imgs \(imageFile, (_, (rotation, mirror))) -> do
+    runPdf outPath docInfo rect $ for_ imgs \(imageFile, (both fromIntegral -> size, (rotation, mirror))) -> do
         pageRef <- addPage Nothing
         jpgRef <- createPDFJpeg imageFile
         drawWithPage pageRef do
@@ -96,6 +96,7 @@ main = do
             when mirror do
                 applyMatrix $ translate $ fst pageSize :+ 0
                 applyMatrix $ scale -1 1
+            applyMatrix $ join scale $ uncurry min $ join biliftA2 (/) pageSize size
             applyMatrix $ rotate $ Degree case rotation of
                 Nothing -> 0
                 Just Ninety -> 90
