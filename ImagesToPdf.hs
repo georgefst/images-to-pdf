@@ -8,6 +8,7 @@
 {- cabal:
 build-depends:
     base,
+    bifunctors,
     containers,
     directory,
     extra,
