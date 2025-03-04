@@ -6,7 +6,7 @@ license-file: LICENSE
 
 executable images-to-pdf
     main-is: ImagesToPdf.hs
-    default-language: GHC2024
+    default-language: GHC2021
     default-extensions:
         BlockArguments
         LambdaCase
