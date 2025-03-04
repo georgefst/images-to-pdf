@@ -1,0 +1,8 @@
+packages: .
+
+if os(windows)
+    constraints:
+        -- doesn't otherwise build without difficult-to-install C library:
+        -- https://github.com/emmanueltouzery/hsexif/issues/7
+        -- https://github.com/emmanueltouzery/hsexif/pull/16
+        hsexif -iconv

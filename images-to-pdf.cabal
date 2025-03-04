@@ -1,0 +1,28 @@
+cabal-version: 3.0
+name: images-to-pdf
+version: 1.0
+license: BSD-3-Clause
+license-file: LICENSE
+
+executable images-to-pdf
+    main-is: ImagesToPdf.hs
+    default-language: GHC2024
+    default-extensions:
+        BlockArguments
+        LambdaCase
+        LexicalNegation
+        ViewPatterns
+    build-depends:
+        base,
+        bifunctors,
+        containers,
+        directory,
+        extra,
+        filepath,
+        HPDF,
+        hsexif,
+        mtl,
+        pretty-simple,
+        transformers,
+    ghc-options:
+        -Wall
