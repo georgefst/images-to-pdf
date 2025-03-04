@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  push:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - name: Linux
+            triple: .#x86_64-unknown-linux-musl
+            path: images-to-pdf
+          - name: Windows
+            triple: .#x86_64-w64-mingw32
+            path: images-to-pdf.exe
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v30
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: cachix/cachix-action@v15
+        with:
+          name: georgefst
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+      - name: "${{ matrix.name }}"
+        run: |
+          nix build "${{ matrix.triple }}":images-to-pdf:exe:images-to-pdf
+          mkdir -p dist
+          cp result/bin/"${{ matrix.path }}" dist/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/images-to-pdf
+            dist/images-to-pdf.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
