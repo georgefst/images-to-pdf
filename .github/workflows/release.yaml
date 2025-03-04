@@ -8,9 +8,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: Linux
-            triple: .#x86_64-unknown-linux-musl
-            path: images-to-pdf
           - name: Windows
             triple: .#x86_64-w64-mingw32
             path: images-to-pdf.exe
