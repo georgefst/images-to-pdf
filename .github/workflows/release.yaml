@@ -10,8 +10,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: Windows
-            triple: .#x86_64-w64-mingw32
+          - triple: .#x86_64-w64-mingw32
             path: images-to-pdf.exe
     runs-on: ubuntu-latest
     steps:
@@ -23,7 +22,7 @@ jobs:
         with:
           name: georgefst
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: ${{ matrix.name }}
+      - name: Build
         run: |
           nix build "${{ matrix.triple }}":images-to-pdf:exe:images-to-pdf
           mkdir -p dist
