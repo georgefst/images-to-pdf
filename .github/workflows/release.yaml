@@ -10,11 +10,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: Linux
-            triple: .#x86_64-unknown-linux-musl
+          - system: x86_64-unknown-linux-musl
             path: images-to-pdf
-          - name: Windows
-            triple: .#x86_64-w64-mingw32
+          - system: x86_64-w64-mingw32
             path: images-to-pdf.exe
     runs-on: ubuntu-latest
     steps:
@@ -27,11 +25,11 @@ jobs:
           name: georgefst
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
-        run: nix build ${{ matrix.triple }}:images-to-pdf:exe:images-to-pdf
+        run: nix build .#${{ matrix.triple }}:images-to-pdf:exe:images-to-pdf
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.name }}
+          name: ${{ matrix.triple }}
           path: result/bin/${{ matrix.path }}
 
   release:
@@ -40,15 +38,11 @@ jobs:
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
-      - name: List
-        run: |
-          ls
-          tree -a
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            Linux/images-to-pdf
-            Windows/images-to-pdf.exe
+            x86_64-unknown-linux-musl/images-to-pdf
+            x86_64-w64-mingw32/images-to-pdf.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
