@@ -36,7 +36,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/images-to-pdf
             dist/images-to-pdf.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
