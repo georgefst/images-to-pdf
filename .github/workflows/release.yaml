@@ -20,8 +20,8 @@ jobs:
       - uses: cachix/cachix-action@v15
         with:
           name: georgefst
-          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-      - name: "${{ matrix.name }}"
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: ${{ matrix.name }}
         run: |
           nix build "${{ matrix.triple }}":images-to-pdf:exe:images-to-pdf
           mkdir -p dist
