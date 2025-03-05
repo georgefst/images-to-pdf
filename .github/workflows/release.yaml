@@ -23,19 +23,18 @@ jobs:
           name: georgefst
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
-        run: |
-          nix build "${{ matrix.triple }}":images-to-pdf:exe:images-to-pdf
-          mkdir -p dist
-          cp result/bin/"${{ matrix.path }}" dist/
-      - name: Upload
+        run: nix build ${{ matrix.triple }}:images-to-pdf:exe:images-to-pdf
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          path: dist/"${{ matrix.path }}"
+          path: result/bin/${{ matrix.path }}
 
   release:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
