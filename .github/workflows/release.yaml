@@ -25,11 +25,11 @@ jobs:
           name: georgefst
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
-        run: nix build .#"${{ matrix.triple }}":images-to-pdf:exe:images-to-pdf
+        run: nix build .#${{ matrix.system }}:images-to-pdf:exe:images-to-pdf
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.triple }}
+          name: ${{ matrix.system }}
           path: result/bin/${{ matrix.path }}
 
   release:
